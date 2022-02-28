@@ -1,5 +1,5 @@
 
-const rolekey = "785574181801820191"
+const rolekey = "rolekeyid"
 
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
 
@@ -55,16 +55,19 @@ module.exports = {
                     .setStyle('DANGER'),
             );
         try {
-                client.channels.fetch('931981734852067428').then((channel) => {
+                client.channels.fetch('rolereviewchannelid').then((channel) => {
                     channel.send({ embeds: [embed], components: [row, row1]})
-                    const filter = m => m.customId === 'yes' || 'no' && m.member.roles.cache.has(rolekey) && m.channel.id === '931981734852067428'
-                    const collector = channel.createMessageComponentCollector({ filter: filter, max: 1, time: 30000 });
+                    const filter = m => m.customId === 'yes' || 'no' && m.member.roles.cache.has(rolekey.id) && m.channel.id === 'rolereviewchannelid'
+
+                    const collector = channel.createMessageComponentCollector({ filter: filter, max: 1, time: 86400*1000 });
                     collector.on('collect', async i => {
-                        if (i.customId === 'yes') {
+                        if (i.customId === 'yes' && i.member.roles.cache.has(rolekey)) {
                             member.roles.add(role)
                             i.reply(`${member} was given his role.`);
+                            collector.stop()
                         } else {
-                            i.reply({ content: `${member} was not given his role.`});
+                            i.reply({ content: `${member} was not given his role. Either from a permission error (you need Role Key) or a bot error (very unlikely).`});
+                            collector.stop()
                         }
                     }
                 )})
